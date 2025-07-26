@@ -6,6 +6,7 @@ from .alert_grouping_settings import (
     update_alert_grouping_setting,
 )
 from .alerts import get_alert, list_alerts
+
 # Currently disabled to prevent issues with the escalation policies domain
 from .escalation_policies import (
     # create_escalation_policy,
