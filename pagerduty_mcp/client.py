@@ -64,5 +64,4 @@ def get_client() -> pagerduty.RestApiV2Client:
     client.api_key = client_config.api_key
     client.url = client_config.api_host
 
-    logger.info(f"Using cached PagerDuty client with API key: {client_config.api_key}")
     return client
