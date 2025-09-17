@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, computed_field, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
 from pagerduty_mcp.models.base import MAX_RESULTS
 from pagerduty_mcp.models.references import ServiceReference, UserReference
@@ -71,7 +71,8 @@ class IncidentQuery(BaseModel):
         # Provide a helpful error when a user mistakenly passes 'statuses' instead of 'status'
         if isinstance(data, dict) and "statuses" in data:
             raise ValueError(
-                'The correct parameter to filter by multiple Incidents statuses is "status", not "statuses", please correct your input and try again'
+                'The correct parameter to filter by multiple Incidents statuses is "status", not "statuses",'
+                ' please correct your input and try again'
             )
         return data
 
