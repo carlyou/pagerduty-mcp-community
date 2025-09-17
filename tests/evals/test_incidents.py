@@ -19,6 +19,23 @@ class IncidentCompetencyTest(CompetencyTest):
 # Define the competency test cases
 INCIDENT_COMPETENCY_TESTS = [
     IncidentCompetencyTest(
+        query="Show me all open and resolved incidents",
+        expected_tools=[
+            {
+                "tool_name": "list_incidents",
+                "parameters": {"query_model": {"status": ["triggered", "acknowledged", "resolved"]}},
+            }
+        ],
+        description="List incidents filtered by status",
+    ),
+    IncidentCompetencyTest(
+        query="List open incidents",
+        expected_tools=[
+            {"tool_name": "list_incidents", "parameters": {"query_model": {"status": ["triggered", "acknowledged"]}}}
+        ],
+        description="List incidents filtered by status",
+    ),
+    IncidentCompetencyTest(
         query="Show me all incidents",
         expected_tools=[{"tool_name": "list_incidents", "parameters": {}}],
         description="Basic incident listing",

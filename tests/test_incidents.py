@@ -492,5 +492,17 @@ class TestIncidentTools(unittest.TestCase):
             json={"note": {"content": "This is a test note"}}
         )
 
+    def test_incidentquery_reject_statuses_param(self):
+        """Ensure providing 'statuses' yields a clear validation error."""
+        from pydantic import ValidationError
+
+        with self.assertRaises(ValidationError) as ctx:
+            IncidentQuery.model_validate({"statuses": ["triggered", "acknowledged"]})
+
+        self.assertIn(
+            'The correct parameter to filter by multiple Incidents statuses is "status", not "statuses"',
+            str(ctx.exception),
+        )
+
 if __name__ == "__main__":
     unittest.main()

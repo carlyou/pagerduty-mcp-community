@@ -21,7 +21,26 @@ from pagerduty_mcp.utils import paginate
 
 
 def list_incidents(query_model: IncidentQuery) -> ListResponseModel[Incident]:
-    """List incidents with optional filtering."""
+    """List incidents with optional filtering.
+
+    Args:
+        query_model: Optional filtering parameters
+
+    Returns:
+        List of Incident objects matching the query parameters
+
+    Examples:
+        Basic usage filtering by status:
+
+        >>> from pagerduty_mcp.models import IncidentQuery
+        >>> result = list_incidents(IncidentQuery(status=["triggered"]))
+        >>> isinstance(result.response, list)
+        True
+
+        Multiple statuses with a limit:
+
+        >>> result = list_incidents(IncidentQuery(status=["triggered", "acknowledged"], limit=10))
+    """
     params = query_model.to_params()
     user_data = get_user_data()
 
