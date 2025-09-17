@@ -6,6 +6,7 @@ import json
 import logging
 import os
 from collections.abc import Sequence
+from contextlib import suppress
 from typing import Any
 
 from dotenv import load_dotenv
@@ -305,6 +306,7 @@ def main():
         "--domain", choices=["all", "incidents", "teams", "services"], default="all", help="Domain to test"
     )
     parser.add_argument("--output", type=str, help="Output file for test report")
+    parser.add_argument("--model", type=str, default="gpt-4.1", help="LLM model to use for tests")
 
     args = parser.parse_args()
 
@@ -314,6 +316,12 @@ def main():
     if not test_cases:
         print(f"No test cases available for domain: {args.domain}")
         return
+
+    # Override model on each test case if provided via flag
+    for tc in test_cases:
+        # Some test case objects may be immutable or restrict attribute setting
+        with suppress(AttributeError, TypeError):
+            tc.model = args.model
 
     # Create and run the test agent
     agent = TestAgent(llm_type=args.llm)
