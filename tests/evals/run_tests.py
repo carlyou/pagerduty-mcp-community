@@ -11,7 +11,6 @@ from typing import Any
 
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
-from openai import OpenAI
 from openai.types.chat import (
     ChatCompletionAssistantMessageParam,
     ChatCompletionSystemMessageParam,
@@ -22,6 +21,7 @@ from pydantic import BaseModel
 from pagerduty_mcp.server import add_read_only_tool, add_write_tool
 from pagerduty_mcp.tools import read_tools, write_tools
 from tests.evals.competency_test import CompetencyTest
+from tests.evals.llm_clients import BedrockClient, LLMClient, OpenAIClient
 from tests.evals.mcp_tool_tracer import MockedMCPServer
 from tests.evals.test_incidents import INCIDENT_COMPETENCY_TESTS
 from tests.evals.test_teams import TEAMS_COMPETENCY_TESTS
@@ -67,32 +67,35 @@ class TestAgent:
     the right parameters.
     """
 
-    def __init__(self, llm_type: str = "gpt"):
+    def __init__(self, llm_type: str = "gpt", aws_region: str = "us-west-2"):
         """Initialize the test agent.
 
         Args:
-            llm_type: The type of LLM to test ("gpt" or other supported types)
+            llm_type: The type of LLM to test ("gpt", "bedrock")
+            aws_region: AWS region for Bedrock (only used when llm_type="bedrock")
         """
         self.llm_type = llm_type
+        self.aws_region = aws_region
         self.results = []
         self.mocked_mcp = MockedMCPServer()
-        self.llm = self._initialize_llm(llm_type)
+        self.llm = self._initialize_llm(llm_type, aws_region)
 
-    def _initialize_llm(self, llm_type: str) -> OpenAI:
+    def _initialize_llm(self, llm_type: str, aws_region: str) -> LLMClient:
         """Initialize the specified LLM client.
 
         Args:
             llm_type: The type of LLM to initialize
+            aws_region: AWS region for Bedrock
 
         Returns:
             Initialized LLM client
         """
         if llm_type == "gpt":
-            api_key = os.getenv("OPENAI_API_KEY")
-            if not api_key:
-                raise ValueError("OPENAI_API_KEY environment variable is required for GPT testing")
-            return OpenAI(api_key=api_key)
-        raise ValueError(f"LLM type {llm_type} is not yet supported")
+            return OpenAIClient()
+        elif llm_type == "bedrock":
+            return BedrockClient(region_name=aws_region)
+        else:
+            raise ValueError(f"LLM type {llm_type} is not supported. Choose from: gpt, bedrock")
 
     def _get_available_tools(self) -> list[dict[str, Any]]:
         """Get tool schemas directly from MCP server (like dbt-labs approach)."""
@@ -158,57 +161,53 @@ class TestAgent:
             print("-" * 40)
             print(f"Testing query: {query}")
 
-            # Make actual call to GPT with function calling
-            system_msg = ChatCompletionSystemMessageParam(
+            # Make actual call to LLM with function calling
+            messages = [
                 {
                     "role": "system",
                     "content": (
                         "You are a PagerDuty assistant. Use the available tools to help users "
                         "with incident management tasks. Call the appropriate functions based on user requests."
                     ),
-                }
-            )
-
-            user_msg = ChatCompletionUserMessageParam({"role": "user", "content": query})
-            messages = [system_msg, user_msg]
+                },
+                {"role": "user", "content": query},
+            ]
 
             conversation_turns = 0
             response = None
             while conversation_turns < test_case.max_conversation_turns:
-                response = self.llm.chat.completions.create(
-                    model=test_case.model,  # TODO: Abstract model providers so we can support Claude etc ..
+                response = self.llm.chat_completion(
+                    model=test_case.model,
                     messages=messages,
-                    tools=self._get_available_tools(),  # type: ignore TODO: fix type hint
+                    tools=self._get_available_tools(),
                     tool_choice="auto",
                 )
 
-                # Process the function calls GPT wants to make
-                if response.choices[0].message.tool_calls:
-                    tool_called = None
-                    for tool_call in response.choices[0].message.tool_calls:
-                        function_name = tool_call.function.name
-                        function_args = json.loads(tool_call.function.arguments)
+                # Process the function calls the LLM wants to make
+                if response.tool_calls:
+                    tool_called = False
+                    for tool_call in response.tool_calls:
+                        function_name = tool_call.name
+                        function_args = tool_call.arguments
 
-                        print(f"GPT called: {function_name} with args: {function_args}")
+                        print(f"LLM called: {function_name} with args: {function_args}")
 
                         # Execute the tool call directly using our MCP client
                         result = self._execute_tool_call(function_name, function_args)
                         print(f"Tool result: {result}")
-                        # Add the tool call and its result to the conversation
 
-                        assistant_msg = ChatCompletionAssistantMessageParam(
-                            {
-                                "role": "assistant",
-                                "content": None,
-                                "tool_calls": [
-                                    {
-                                        "id": tool_call.id,
-                                        "type": "function",
-                                        "function": {"name": function_name, "arguments": tool_call.function.arguments},
-                                    }
-                                ],
-                            }
-                        )
+                        # Add the tool call and its result to the conversation
+                        assistant_msg = {
+                            "role": "assistant",
+                            "content": response.content,
+                            "tool_calls": [
+                                {
+                                    "id": tool_call.id,
+                                    "type": "function",
+                                    "function": {"name": function_name, "arguments": json.dumps(function_args)},
+                                }
+                            ],
+                        }
                         messages.append(assistant_msg)
                         messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": json.dumps(result)})
                         tool_called = True
@@ -231,7 +230,7 @@ class TestAgent:
                     expected_tools=expected_tools,
                     actual_tools=self.mocked_mcp.tool_calls,
                     success=success,
-                    gpt_response=response.choices[0].message.content or "No text response",
+                    gpt_response=response.content or "No text response",
                 )
 
         except Exception as e:  # noqa: BLE001
@@ -301,12 +300,20 @@ class TestAgent:
 def main():
     """Main entry point for running the tests."""
     parser = argparse.ArgumentParser(description="Test LLM competency with MCP tools")
-    parser.add_argument("--llm", choices=["gpt"], default="gpt", help="LLM provider to use for testing")
+    parser.add_argument(
+        "--llm", choices=["gpt", "bedrock"], default="gpt", help="LLM provider to use for testing"
+    )
     parser.add_argument(
         "--domain", choices=["all", "incidents", "teams", "services"], default="all", help="Domain to test"
     )
     parser.add_argument("--output", type=str, help="Output file for test report")
     parser.add_argument("--model", type=str, default="gpt-4.1", help="LLM model to use for tests")
+    parser.add_argument(
+        "--aws-region",
+        type=str,
+        default="us-west-2",
+        help="AWS region for Bedrock (only used when --llm=bedrock)",
+    )
 
     args = parser.parse_args()
 
@@ -324,7 +331,7 @@ def main():
             tc.model = args.model
 
     # Create and run the test agent
-    agent = TestAgent(llm_type=args.llm)
+    agent = TestAgent(llm_type=args.llm, aws_region=args.aws_region)
     agent.run_tests(test_cases)
 
     # Generate report
