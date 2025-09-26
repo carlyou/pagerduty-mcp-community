@@ -300,9 +300,7 @@ class TestAgent:
 def main():
     """Main entry point for running the tests."""
     parser = argparse.ArgumentParser(description="Test LLM competency with MCP tools")
-    parser.add_argument(
-        "--llm", choices=["gpt", "bedrock"], default="gpt", help="LLM provider to use for testing"
-    )
+    parser.add_argument("--llm", choices=["gpt", "bedrock"], default="gpt", help="LLM provider to use for testing")
     parser.add_argument(
         "--domain", choices=["all", "incidents", "teams", "services"], default="all", help="Domain to test"
     )
