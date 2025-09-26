@@ -77,31 +77,6 @@ def update_alert_grouping_setting(
 
     Returns:
         The updated alert grouping setting
-
-    Examples:
-        Update alert grouping setting:
-
-        >>> from pagerduty_mcp.models import (
-        ...     AlertGroupingSettingUpdateRequest,
-        ...     AlertGroupingSettingCreate,
-        ...     ContentBasedConfig,
-        ...     ServiceReference
-        ... )
-        >>> config = ContentBasedConfig(
-        ...     aggregate="any",
-        ...     fields=["summary"],
-        ...     time_window=1800
-        ... )
-        >>> setting = AlertGroupingSettingCreate(
-        ...     name="Updated Alert Grouping",
-        ...     type="content_based",
-        ...     config=config,
-        ...     services=[ServiceReference(id="PSERVICE1")]
-        ... )
-        >>> request = AlertGroupingSettingUpdateRequest(alert_grouping_setting=setting)
-        >>> result = update_alert_grouping_setting("PAGS123", request)
-        >>> isinstance(result, AlertGroupingSetting)
-        True
     """
     response = get_client().rput(
         f"/alert_grouping_settings/{setting_id}", json=update_model.model_dump(exclude_none=True)
@@ -122,12 +97,6 @@ def delete_alert_grouping_setting(setting_id: str) -> None:
 
     Returns:
         None (successful deletion returns no content)
-
-    Examples:
-        Delete alert grouping setting:
-
-        >>> delete_alert_grouping_setting("PAGS123")
-        # Returns None on successful deletion
     """
     get_client().rdelete(f"/alert_grouping_settings/{setting_id}")
     # The API returns 204 No Content for successful deletion
