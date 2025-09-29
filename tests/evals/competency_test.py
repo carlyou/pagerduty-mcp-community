@@ -125,6 +125,7 @@ class CompetencyTest(ABC):
 
     def _has_required_structure(self, expected: dict[str, Any], actual: dict[str, Any]) -> bool:
         """Check if actual has the basic required structure."""
+
         def check_structure(exp_item: Any, act_item: Any) -> bool:
             if isinstance(exp_item, dict) and isinstance(act_item, dict):
                 for key in exp_item:
@@ -133,10 +134,9 @@ class CompetencyTest(ABC):
                     if not check_structure(exp_item[key], act_item[key]):
                         return False
                 return True
-            elif isinstance(exp_item, list) and isinstance(act_item, list):
+            if isinstance(exp_item, list) and isinstance(act_item, list):
                 return True  # Allow flexibility in list contents
-            else:
-                return True  # Allow value differences for leaf nodes
+            return True  # Allow value differences for leaf nodes
 
         return check_structure(expected, actual)
 
@@ -146,8 +146,9 @@ class CompetencyTest(ABC):
         create_model = expected.get("create_model") or actual.get("create_model")
         update_model = expected.get("update_model") or actual.get("update_model")
 
-        return (create_model and "alert_grouping_setting" in create_model) or \
-               (update_model and "alert_grouping_setting" in update_model)
+        return (create_model and "alert_grouping_setting" in create_model) or (
+            update_model and "alert_grouping_setting" in update_model
+        )
 
     def _validate_alert_grouping_params(self, expected: dict[str, Any], actual: dict[str, Any]) -> bool:
         """Specialized validation for Alert Grouping Settings parameters."""
@@ -200,11 +201,11 @@ class CompetencyTest(ABC):
 
         if setting_type == "content_based":
             return self._validate_content_based_config(exp_config, act_config)
-        elif setting_type == "content_based_intelligent":
+        if setting_type == "content_based_intelligent":
             return self._validate_content_based_intelligent_config(exp_config, act_config)
-        elif setting_type == "time":
+        if setting_type == "time":
             return self._validate_time_config(exp_config, act_config)
-        elif setting_type == "intelligent":
+        if setting_type == "intelligent":
             return self._validate_intelligent_config(exp_config, act_config)
 
         return False
@@ -223,10 +224,7 @@ class CompetencyTest(ABC):
 
         # Time window must be valid (allow any valid value, including 0 for recommended)
         act_time_window = actual.get("time_window")
-        if not isinstance(act_time_window, int) or act_time_window < 0:
-            return False
-
-        return True
+        return isinstance(act_time_window, int) and act_time_window >= 0
 
     def _validate_content_based_intelligent_config(self, expected: dict[str, Any], actual: dict[str, Any]) -> bool:
         """Validate content-based intelligent configuration."""
@@ -246,8 +244,4 @@ class CompetencyTest(ABC):
 
         # iag_fields is optional but if present, must be valid
         act_iag_fields = actual.get("iag_fields")
-        if act_iag_fields is not None:
-            if not isinstance(act_iag_fields, list) or not act_iag_fields:
-                return False
-
-        return True
+        return act_iag_fields is None or (isinstance(act_iag_fields, list) and act_iag_fields)

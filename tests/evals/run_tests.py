@@ -27,8 +27,12 @@ test_mapping = {
     "incidents": INCIDENT_COMPETENCY_TESTS,
     "teams": TEAMS_COMPETENCY_TESTS,
     "event-orchestrations": EVENT_ORCHESTRATIONS_COMPETENCY_TESTS,
-    "all": INCIDENT_COMPETENCY_TESTS + TEAMS_COMPETENCY_TESTS + ALERT_GROUPING_SETTINGS_COMPETENCY_TESTS + EVENT_ORCHESTRATIONS_COMPETENCY_TESTS,
-
+    "all": (
+        INCIDENT_COMPETENCY_TESTS
+        + TEAMS_COMPETENCY_TESTS
+        + ALERT_GROUPING_SETTINGS_COMPETENCY_TESTS
+        + EVENT_ORCHESTRATIONS_COMPETENCY_TESTS
+    ),
 }
 
 load_dotenv()
@@ -301,7 +305,7 @@ def main():
     parser.add_argument("--llm", choices=["gpt", "bedrock"], default="gpt", help="LLM provider to use for testing")
     parser.add_argument(
         "--domain",
-        choices=["all", "alert-grouping-settings" "incidents", "teams", "event-orchestrations", "services"],
+        choices=["all", "alert-grouping-settings", "incidents", "teams", "event-orchestrations", "services"],
         default="all",
         help="Domain to test",
     )
