@@ -93,6 +93,23 @@ class TestIncidentTools(unittest.TestCase):
     @patch("pagerduty_mcp.tools.incidents.get_client")
     @patch("pagerduty_mcp.tools.incidents.get_user_data")
     @patch("pagerduty_mcp.tools.incidents.paginate")
+    def test_list_incidents_all(self, mock_paginate, mock_get_user_data, mock_get_client):
+        """Fetching all incidents shouldn't call sub-tools it doesn't need."""
+
+        # Setup mocks
+        mock_paginate.return_value = [self.sample_incident_data]
+
+        # Test with account level query
+        query = IncidentQuery(request_scope="all")
+        _ = list_incidents(query)
+
+        # Verify paginate was called without user context
+        mock_paginate.assert_called_once()
+        mock_get_user_data.assert_not_called()
+
+    @patch("pagerduty_mcp.tools.incidents.get_client")
+    @patch("pagerduty_mcp.tools.incidents.get_user_data")
+    @patch("pagerduty_mcp.tools.incidents.paginate")
     def test_list_incidents_assigned_scope(self, mock_paginate, mock_get_user_data, mock_get_client):
         """Test listing incidents with assigned scope."""
         # Setup mocks
@@ -125,6 +142,20 @@ class TestIncidentTools(unittest.TestCase):
         call_args = mock_paginate.call_args
         self.assertIn("teams_ids[]", call_args[1]["params"])
         self.assertEqual(call_args[1]["params"]["teams_ids[]"], ["PTEAM123"])
+
+    @patch("pagerduty_mcp.tools.incidents.get_user_data")
+    def test_list_incidents_user_required_error(self, mock_get_user):
+        """If the request_scope requires user context but none is available, an error should be raised."""
+        # Setup mocks
+        mock_get_user.side_effect = Exception("users/me does not work for account-level tokens")
+
+        # Test with user required query
+        query = IncidentQuery(request_scope="assigned")
+
+        with self.assertRaises(Exception) as context:
+            list_incidents(query)
+
+        self.assertIn("users/me does not work for account-level tokens", str(context.exception))
 
     @patch("pagerduty_mcp.tools.incidents.get_client")
     @patch("pagerduty_mcp.tools.incidents.get_user_data")
