@@ -1,6 +1,6 @@
 # PagerDuty's official MCP Server
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=pagerduty-mcp&config=ewogICAgICAidHlwZSI6ICJzdGRpbyIsCiAgICAgICJjb21tYW5kIjogInV2eCIsCiAgICAgICJhcmdzIjogWwogICAgICAgICJwYWdlcmR1dHktbWNwIiwKICAgICAgICAiLS1lbmFibGUtd3JpdGUtdG9vbHMiCiAgICAgIF0sCiAgICAgICJlbnYiOiB7CiAgICAgICAgIlBBR0VSRFVUWV9VU0VSX0FQSV9LRVkiOiAiIiwKICAgICAgICAiUEFHRVJEVVRZX0FQSV9IT1NUIjogImh0dHBzOi8vYXBpLnBhZ2VyZHV0eS5jb20iCiAgICAgIH0KICAgIH0=)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](cursor://anysphere.cursor-deeplink/mcp/install?name=pagerduty-mcp&config=eyJlbnYiOnsiUEFHRVJEVVRZX1VTRVJfQVBJX0tFWSI6IiR7aW5wdXQ6cGFnZXJkdXR5LWFwaS1rZXl9In0sImNvbW1hbmQiOiJ1dnggLXkgcGFnZXJkdXR5LW1jcCJ9)
 
 PagerDuty's local MCP (Model Context Protocol) server which provides tools to interact with your PagerDuty account, allowing you to manage incidents, services, schedules, event orchestrations, and more directly from your MCP-enabled client.
 
