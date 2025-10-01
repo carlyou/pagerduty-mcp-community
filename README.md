@@ -34,7 +34,7 @@ You can configure this MCP server directly within Cursor's `settings.json` file,
           "args": [
             "pagerduty-mcp",
             "--enable-write-tools"
-                            // This flag enables write operations on the MCP Server enabling you to creating incidents, schedule overrides and much more
+            // This flag enables write operations on the MCP Server enabling you to creating incidents, schedule overrides and much more
           ],
           "env": {
             "PAGERDUTY_USER_API_KEY": "${input:pagerduty-api-key}"
