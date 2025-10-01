@@ -1,7 +1,5 @@
 # PagerDuty's official MCP Server
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)]([https://cursor.com/install-mcp?name=pagerduty-mcp&config=eyJlbnYiOnsiUEFHRVJEVVRZX1VTRVJfQVBJX0tFWSI6IiR7aW5wdXQ6cGFnZXJkdXR5LWFwaS1rZXl9In0sImNvbW1hbmQiOiJ1dnggLXkgcGFnZXJkdXR5LW1jcCJ9](https://cursor.com/install-mcp?name=pagerduty-mcp&config=eyJlbnYiOnsiUEFHRVJEVVRZX1VTRVJfQVBJX0tFWSI6IiR7aW5wdXQ6cGFnZXJkdXR5LWFwaS1rZXl9In0sImNvbW1hbmQiOiJ1dnggLXkgcGFnZXJkdXR5LW1jcCJ9))
-
 PagerDuty's local MCP (Model Context Protocol) server which provides tools to interact with your PagerDuty account, allowing you to manage incidents, services, schedules, event orchestrations, and more directly from your MCP-enabled client.
 
 ## Prerequisites
@@ -19,6 +17,32 @@ PagerDuty's local MCP (Model Context Protocol) server which provides tools to in
     > Use of the PagerDuty User API Token is subject to the [PagerDuty Developer Agreement](https://developer.pagerduty.com/docs/pagerduty-developer-agreement).
 
 ## Using with MCP Clients
+
+### Cursor Integration
+
+You can configure this MCP server directly within Cursor's `settings.json` file, by following these steps:
+
+1.  Open Cursor settings (Cursor Settings > Tools > Add MCP, or `Cmd+,` on Mac, or `Ctrl+,` on Windows/Linux).
+2.  Add the following configuration:
+
+    ```json
+    {
+      "mcpServers": {
+        "pagerduty-mcp": {
+          "type": "stdio",
+          "command": "uvx",
+          "args": [
+            "pagerduty-mcp",
+            "--enable-write-tools"
+                            // This flag enables write operations on the MCP Server enabling you to creating incidents, schedule overrides and much more
+          ],
+          "env": {
+            "PAGERDUTY_USER_API_KEY": "${input:pagerduty-api-key}"
+          }
+        }
+      }
+    }
+    ```
 
 ### VS Code Integration
 
