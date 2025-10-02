@@ -1,6 +1,19 @@
-# PagerDuty's official MCP Server
+# PagerDuty MCP Server - Community Edition
 
 <!-- mcp-name: io.github.PagerDuty/pagerduty-mcp -->
+
+## About This Fork
+
+This is a **community-maintained fork** of [PagerDuty's official MCP Server](https://github.com/pagerduty/pagerduty-mcp-server) with additional capabilities and features. The enhancements in this fork have been submitted as a pull request to the upstream repository but have not yet been merged.
+
+**Key differences from the official package:**
+- Additional tools and functionality (see capabilities below)
+- Community-driven development and faster iteration
+- Published on PyPI as `pagerduty-mcp-community` for easy installation
+
+For the official PagerDuty package, see [`pagerduty-mcp`](https://pypi.org/project/pagerduty-mcp/) on PyPI.
+
+## Overview
 
 PagerDuty's local MCP (Model Context Protocol) server which provides tools to interact with your PagerDuty account, allowing you to manage incidents, services, schedules, event orchestrations, and more directly from your MCP-enabled client.
 
@@ -34,7 +47,7 @@ You can configure this MCP server directly within Cursor's `settings.json` file,
           "type": "stdio",
           "command": "uvx",
           "args": [
-            "pagerduty-mcp",
+            "pagerduty-mcp-community",
             "--enable-write-tools"
             // This flag enables write operations on the MCP Server enabling you to creating incidents, schedule overrides and much more
           ],
@@ -67,11 +80,11 @@ You can configure this MCP server directly within Visual Studio Code's `settings
                 }
             ],
             "servers": {
-                "pagerduty-mcp": { 
+                "pagerduty-mcp": {
                     "type": "stdio",
                     "command": "uvx",
                     "args": [
-                        "pagerduty-mcp",
+                        "pagerduty-mcp-community",
                         "--enable-write-tools"
                         // This flag enables write operations on the MCP Server enabling you to creating incidents, schedule overrides and much more
                     ],
@@ -111,7 +124,7 @@ You can configure this MCP server to work with Claude Desktop by adding it to Cl
         "pagerduty-mcp": {
           "command": "uvx",
           "args": [
-            "pagerduty-mcp",
+            "pagerduty-mcp-community",
             "--enable-write-tools"
           ],
           "env": {

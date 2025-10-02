@@ -1,17 +1,44 @@
 [project]
-name = "pagerduty-mcp"
+name = "pagerduty-mcp-community"
 version = "0.2.1"
-description = "PagerDuty's official local MCP (Model Context Protocol) server which provides tools to interact with your PagerDuty account directly from your MCP-enabled client."
+description = "Community-maintained fork of PagerDuty's MCP server with additional capabilities for interacting with your PagerDuty account."
 readme = "README.md"
+license = { text = "Apache-2.0" }
 requires-python = ">=3.12,<3.13"
+keywords = ["pagerduty", "mcp", "model-context-protocol", "incidents", "monitoring", "devops"]
+authors = [
+    { name = "PagerDuty" },
+    { name = "Community Contributors" }
+]
+maintainers = [
+    { name = "Community Contributors" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Monitoring",
+    "Topic :: Communications :: Chat",
+]
 dependencies = [
     "mcp[cli]>=1.8.0",
     "pagerduty>=2.0.0",
     "typer>=0.16.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/carlyou/pagerduty-mcp-community"
+Repository = "https://github.com/carlyou/pagerduty-mcp-community"
+"Issue Tracker" = "https://github.com/carlyou/pagerduty-mcp-community/issues"
+"Original Project" = "https://github.com/PagerDuty/pagerduty-mcp-server"
+
 [project.scripts]
-pagerduty-mcp = "pagerduty_mcp.__main__:main"
+pagerduty-mcp-community = "pagerduty_mcp.__main__:main"
 
 [tool.pyright]
 include = ["app"]
