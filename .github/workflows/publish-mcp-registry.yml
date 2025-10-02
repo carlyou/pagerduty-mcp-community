@@ -1,0 +1,79 @@
+# This workflow publishes the PagerDuty MCP server to the MCP Registry
+# Trigger manually from the Actions tab in GitHub
+
+name: Publish to MCP Registry
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write  # Required for GitHub OIDC authentication
+
+jobs:
+  validate-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install jsonschema
+
+      - name: Sync version from pyproject.toml to server.json
+        run: |
+          python -c "
+          import json
+          import tomllib as tomli
+
+          # Read version from pyproject.toml
+          with open('pyproject.toml', 'rb') as f:
+              pyproject = tomli.load(f)
+              version = pyproject['project']['version']
+
+          # Update server.json with the version
+          with open('server.json', 'r') as f:
+              server_config = json.load(f)
+
+          server_config['version'] = version
+          # Also update package version if it exists
+          if 'packages' in server_config:
+              for package in server_config['packages']:
+                  package['version'] = version
+
+          with open('server.json', 'w') as f:
+              json.dump(server_config, f, indent=2)
+
+          print(f'Updated server.json to version {version}')
+          "
+
+      - name: Validate server.json
+        run: |
+          python scripts/validate_server_json.py
+
+      - name: Install mcp-publisher
+        run: |
+          # Install mcp-publisher from their releases
+          curl -fsSL https://raw.githubusercontent.com/modelcontextprotocol/publisher/main/scripts/install.sh | bash
+          # Make it available in PATH
+          echo "$HOME/.mcp-publisher/bin" >> $GITHUB_PATH
+
+      - name: Wait for mcp-publisher to be available
+        run: |
+          sleep 2
+          which mcp-publisher || (echo "mcp-publisher not found in PATH" && exit 1)
+
+      - name: Authenticate with MCP Registry
+        run: |
+          mcp-publisher login github-oidc
+
+      - name: Publish to MCP Registry
+        run: |
+          mcp-publisher publish

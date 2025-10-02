@@ -1,0 +1,54 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.pagerduty/pagerduty-mcp",
+  "description": "PagerDuty's official MCP server which provides tools to interact with your PagerDuty account.",
+  "version": "0.2.0",
+  "repository": {
+    "url": "https://github.com/PagerDuty/pagerduty-mcp-server",
+    "source": "github"
+  },
+  "websiteUrl": "https://github.com/PagerDuty/pagerduty-mcp-server",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.pagerduty.com/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Token token={PAGERDUTY_USER_API_KEY}",
+          "description": "PagerDuty User API Token - obtain from User Settings > API Access in your PagerDuty account",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "pagerduty-mcp",
+      "version": "0.2.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "runtimeHint": "uvx",
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "--enable-write-tools"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "name": "PAGERDUTY_USER_API_KEY",
+          "description": "PagerDuty User API Token - obtain from User Settings > API Access in your PagerDuty account",
+          "required": true
+        },
+        {
+          "name": "PAGERDUTY_API_HOST",
+          "description": "PagerDuty API host URL (default: https://api.pagerduty.com, EU: https://api.eu.pagerduty.com)",
+          "required": false
+        }
+      ]
+    }
+  ]
+}
