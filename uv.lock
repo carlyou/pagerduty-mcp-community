@@ -588,7 +588,7 @@ wheels = [
 
 [[package]]
 name = "pagerduty-mcp-community"
-version = "0.2.1"
+version = "0.2.2b1"
 source = { editable = "." }
 dependencies = [
     { name = "mcp", extra = ["cli"] },

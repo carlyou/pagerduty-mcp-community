@@ -1,6 +1,6 @@
 [project]
 name = "pagerduty-mcp-community"
-version = "0.2.1"
+version = "0.2.2b1"
 description = "Community-maintained fork of PagerDuty's MCP server with additional capabilities for interacting with your PagerDuty account."
 readme = "README.md"
 license = { text = "Apache-2.0" }
