@@ -58,22 +58,14 @@ jobs:
         run: |
           python scripts/validate_server_json.py
 
-      - name: Install mcp-publisher
+      - name: Install MCP Publisher
         run: |
-          # Install mcp-publisher from their releases
-          curl -fsSL https://raw.githubusercontent.com/modelcontextprotocol/publisher/main/scripts/install.sh | bash
-          # Make it available in PATH
-          echo "$HOME/.mcp-publisher/bin" >> $GITHUB_PATH
-
-      - name: Wait for mcp-publisher to be available
-        run: |
-          sleep 2
-          which mcp-publisher || (echo "mcp-publisher not found in PATH" && exit 1)
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/download/v1.1.0/mcp-publisher_1.1.0_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
 
       - name: Authenticate with MCP Registry
         run: |
-          mcp-publisher login github-oidc
+          ./mcp-publisher login github-oidc
 
       - name: Publish to MCP Registry
         run: |
-          mcp-publisher publish
+          ./mcp-publisher publish
