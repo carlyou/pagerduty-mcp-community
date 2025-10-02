@@ -8,20 +8,6 @@
     "source": "github"
   },
   "websiteUrl": "https://github.com/PagerDuty/pagerduty-mcp-server",
-  "remotes": [
-    {
-      "type": "streamable-http",
-      "url": "https://mcp.pagerduty.com/mcp",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Token token={PAGERDUTY_USER_API_KEY}",
-          "description": "PagerDuty User API Token - obtain from User Settings > API Access in your PagerDuty account",
-          "required": true
-        }
-      ]
-    }
-  ],
   "packages": [
     {
       "registryType": "pypi",
