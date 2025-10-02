@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
-  "name": "io.github.pagerduty/pagerduty-mcp",
+  "name": "io.github.PagerDuty/pagerduty-mcp",
   "description": "PagerDuty's official MCP server which provides tools to interact with your PagerDuty account.",
   "version": "0.2.0",
   "repository": {
